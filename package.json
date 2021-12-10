@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/Zhark10/tgbot#readme",
   "dependencies": {
+    "lowdb": "^3.0.0",
+    "node-fetch": "^3.1.0",
     "node-telegram-bot-api": "^0.54.0",
     "nodemon": "^2.0.15"
   }
