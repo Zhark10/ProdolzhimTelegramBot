@@ -1,21 +1,38 @@
 
-const TelegramApi = require('node-telegram-bot-api');
-var express = require("express");
-var low = require("lowdb");
-var FileSync = require("lowdb/adapters/FileSync");
-var path = require("path");
-var adapter = new FileSync("db.json");
-var db = low(adapter);
-var app = express();
-var bodyParser = require("body-parser");
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
+import TelegramApi from 'node-telegram-bot-api';
+import { join, dirname } from 'path'
+import { Low, JSONFile } from 'lowdb'
+import { fileURLToPath } from 'url'
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+let db;
+
+const defaultDatabaseState = {
+  histories: {
+    id: 1,
+    name: "Вроде бы типичный день",
+    state: "Однажды он просто встал, почистил зубы и резко осознал тот факт, что"
+  }
+}
+
+export async function createConnection() {
+  const file = join(__dirname, 'db.json')
+  const adapter = new JSONFile(file)
+  db = await new Low(adapter)
+  db.data ||= defaultDatabaseState
+  db.read()
+}
+
+export const getConnetcion = () => db
+createConnection()
 
 const token = '5035331349:AAHG-3mOMX0gu-1X0bDA31PxTXGQ1akhn1E'
 
 const bot = new TelegramApi(token, { polling: true })
 
 const start = () => {
+
   bot.setMyCommands(
     [
       { command: '/start', description: 'Приветствие' },
@@ -33,10 +50,13 @@ const start = () => {
     }
 
     if (text === "/continue") {
-      app.get("/histories", function(request, response) {
-        console.log('histories', response)
-      });
-      await bot.sendMessage("")
+      db.data.histories.push({
+        id: 2,
+        name: "Вроде бы типичный день",
+        state: "Однажды он просто встал, почистил зубы и резко осознал тот факт, что"
+      })
+      console.log('sdgdf', db.data)
+      await bot.sendMessage(chatId, "sdf")
     }
 
     return bot.sendMessage(chatId, `Я тебя не понимаю, попробуй объяснить еще раз!`)
@@ -44,7 +64,3 @@ const start = () => {
 }
 
 start()
-
-var listener = app.listen(8080, function() {
-  console.log("Listening on port " + listener.address().port);
-});
