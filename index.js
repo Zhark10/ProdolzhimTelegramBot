@@ -32,7 +32,7 @@ const start = () => {
   bot.setMyCommands(
     [
       { command: '/start', description: 'Приветствие' },
-      { command: '/continue', description: 'Продолжить текст' },
+      { command: '/create', description: 'Создать историю' },
     ]
   )
 
@@ -45,14 +45,9 @@ const start = () => {
       return bot.sendMessage(chatId, `Привет, ${msg.from.first_name} ${msg.from.last_name}! Добро пожаловать в "Продолжим?"`)
     }
 
-    if (text === "/continue") {
-      db.data.histories.push({
-        id: 2,
-        name: "Вроде бы типичный день",
-        state: "Однажды он просто встал, почистил зубы и резко осознал тот факт, что"
-      })
-      console.log('sdgdf', db.data)
-      await bot.sendMessage(chatId, "sdf")
+    if (text.includes("/continue-")) {
+      const storyId = text.split("-")[1]
+      await bot.sendMessage(chatId, storyId || 'Извините, но история не найдена')
     }
 
     return bot.sendMessage(chatId, `Я тебя не понимаю, попробуй объяснить еще раз!`)
