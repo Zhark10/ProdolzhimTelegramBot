@@ -9,11 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 let db;
 
 const defaultDatabaseState = {
-  histories: {
-    id: 1,
-    name: "Вроде бы типичный день",
-    state: "Однажды он просто встал, почистил зубы и резко осознал тот факт, что"
-  }
+  histories: []
 }
 
 export async function createConnection() {
