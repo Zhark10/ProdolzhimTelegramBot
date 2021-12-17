@@ -1,22 +1,22 @@
 import { CommandService } from "../services/CommandService.js"
 import { CONSTANTS } from "../config/constants.js"
+import { findCommandByUserMessage } from "../utils/find-command-by-user-message.js"
 
-const { COMMANDS, DEFAULT_COMMANDS } = CONSTANTS
+const { ALL_COMMANDS, MENU_COMMANDS } = CONSTANTS
 
 export const MessagesHandler = async (bot, db) => {
-  bot.setMyCommands(DEFAULT_COMMANDS)
+  bot.setMyCommands(MENU_COMMANDS)
   const commandService = new CommandService(bot, db)
 
-  bot.on("message", async (msg) => {
-    const text = msg.text
+  bot.on("message", async (message) => {
     const actions = {
-      [COMMANDS.start]: commandService.start,
-      [COMMANDS.create]: commandService.create,
-      [COMMANDS.continue]: commandService.continue,
+      [ALL_COMMANDS.start]: commandService.start,
+      [ALL_COMMANDS.create]: commandService.create,
+      [ALL_COMMANDS.continue]: commandService.continue,
     }
 
-    const foundCommand = Object.values(COMMANDS).find(com => text.includes(com))
+    const foundCommand = findCommandByUserMessage(message.text)
     const definedAction = actions[foundCommand] || commandService.throwDefaultCase
-    return definedAction(msg)
+    return definedAction(message)
   })
 }
