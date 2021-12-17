@@ -1,15 +1,18 @@
-const COMMANDS = {
+const SEPARATOR_TO_CREATE_UNIQUE_COMMAND = "_"
+
+const ALL_COMMANDS = {
   start: "/start",
   create: "/create",
-  continue: "/continue-",
+  continue: `/continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}`,
 }
 
-const DEFAULT_COMMANDS = [
-  { command: COMMANDS.start, description: "Приветствие" },
-  { command: COMMANDS.create, description: "Создать историю" },
+const MENU_COMMANDS = [
+  { command: ALL_COMMANDS.start, description: "Приветствие" },
+  { command: ALL_COMMANDS.create, description: "Создать историю" },
 ]
 
 export const CONSTANTS = {
-  COMMANDS,
-  DEFAULT_COMMANDS
+  SEPARATOR_TO_CREATE_UNIQUE_COMMAND,
+  ALL_COMMANDS,
+  MENU_COMMANDS,
 }

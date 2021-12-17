@@ -4,7 +4,7 @@ import { fileURLToPath } from "url"
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-let db;
+let database;
 
 const defaultDatabaseState = {
   histories: []
@@ -13,13 +13,13 @@ const defaultDatabaseState = {
 const createDatabaseConnection = async () => {
   const file = join(__dirname, "db.json")
   const adapter = new JSONFile(file)
-  db = await new Low(adapter)
-  db.data ||= defaultDatabaseState
-  db.read()
-  return db
+  database = await new Low(adapter)
+  database.data ||= defaultDatabaseState
+  database.read()
+  return database
 }
 
-const getConnection = () => db
+const getConnection = () => database
 
 export {
   createDatabaseConnection,
