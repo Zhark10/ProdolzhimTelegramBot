@@ -1,3 +1,6 @@
+import { CONSTANTS } from "../config/constants.js"
+import crypto from "crypto";
+
 export class CommandService {
   constructor(bot, db) {
     this.bot = bot
@@ -11,19 +14,29 @@ export class CommandService {
   }
 
   create = async (msg) => {
+    const chatId = msg.chat.id
+    const id = crypto.randomBytes(16).toString("hex");
     await this.db.data
       .histories
-      .push({ title: 'Новая история', text: 'История начинается, когда', id: 1 })
+      .push({ title: 'Новая история', text: 'История начинается, когда', id })
+      return this.bot.sendMessage(chatId, `Чтобы продолжить историю, нажми на /continue${CONSTANTS.SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${id}`)
   }
 
   continue = async (msg) => {
     const text = msg.text
-    const storyId = text.split("-")[1]
     const chatId = msg.chat.id
-    return this.bot.sendMessage(chatId, storyId || "Извините, но история не найдена")
+    const allHistories = this.db.data.histories
+
+    const historyIdToSearching = text.split(CONSTANTS.SEPARATOR_TO_CREATE_UNIQUE_COMMAND)[1]
+    const historyIndex = await allHistories.findIndex(history => history.id === historyIdToSearching)
+    if (allHistories[historyIndex]?.text) {
+      allHistories[historyIndex].text = allHistories[historyIndex].text + text
+      return this.bot.sendMessage(chatId, allHistories[historyIndex].text)
+    }
+    return this.bot.sendMessage(chatId, "Не удалось дополнить историю")
   }
 
-  throwDefaultCase = async(msg) => {
+  throwDefaultCase = async (msg) => {
     const chatId = msg.chat.id
     return this.bot.sendMessage(chatId, `Я тебя не понимаю, попробуй объяснить еще раз!`)
   }
