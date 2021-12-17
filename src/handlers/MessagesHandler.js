@@ -16,7 +16,7 @@ export const MessagesHandler = async (bot, db) => {
     }
 
     const foundCommand = findCommandByUserMessage(message.text)
-    const definedAction = actions[foundCommand] || commandService.throwDefaultCase
+    const definedAction = actions[foundCommand] || commandService.checkingNextHistoryVersion
     return definedAction(message)
   })
 }
