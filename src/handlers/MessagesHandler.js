@@ -4,9 +4,9 @@ import { findCommandByUserMessage } from "../utils/find-command-by-user-message.
 
 const { ALL_COMMANDS, MENU_COMMANDS } = CONSTANTS
 
-export const MessagesHandler = async (bot, client) => {
+export const MessagesHandler = async (bot) => {
   bot.setMyCommands(MENU_COMMANDS)
-  const commandService = new CommandService(bot, client)
+  const commandService = new CommandService(bot)
 
   bot.on("message", async (message) => {
     const actions = {
