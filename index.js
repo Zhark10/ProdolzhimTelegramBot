@@ -4,8 +4,8 @@ import { createDatabaseConnection } from "./src/config/db-connection.js"
 import { bot } from "./src/config/bot-initialize.js"
 
 const startBot = async () => {
-  const database = await createDatabaseConnection()
-  return MessagesHandler(bot, database)
+  const client = await createDatabaseConnection()
+  return MessagesHandler(bot, client)
 }
 
 startBot()
