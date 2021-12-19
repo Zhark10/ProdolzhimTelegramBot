@@ -17,7 +17,11 @@ export class CommandService {
 
   start = async (msg) => {
     const chatId = msg.chat.id
-    await User.create({ firstname: msg.from.first_name, lastname: msg.from.last_name })
+    const isUserAlreadyExist = await User.findOne({ firstname: msg.from.first_name, lastname: msg.from.last_name }).exec();
+    if (!isUserAlreadyExist) {
+      await User.create({ firstname: msg.from.first_name, lastname: msg.from.last_name })
+    }
+
     await this.bot.sendSticker(chatId, "https://tlgrm.ru/_/stickers/e1f/4c4/e1f4c48a-c808-37a7-a037-bfa58e8b3222/1.webp")
     return this.bot.sendMessage(chatId, `Привет, ${msg.from.first_name} ${msg.from.last_name}${emoji.v} Добро пожаловать в "Продолжим?"`)
   }
@@ -63,7 +67,7 @@ export class CommandService {
         return this.bot.sendMessage(chatId, `К сожалению, твой отрывок превышает допустимый лимит (${foundStory.stepSize} слов), который задал автор!`)
       }
       await Story.updateOne({ _id: foundStory._id }, { text })
-      await this.bot.sendMessage(chatId, `Ееее, записано ${emoji.writing_hand} Ты просто ${emoji.sparkles}! Теперь перешли другу следующее сообщение:`)
+      await this.bot.sendMessage(chatId, `Ееее, записано ${emoji.writing_hand} Ты просто космос${emoji.sparkles} Теперь перешли другу следующее сообщение:`)
       return this.bot.sendMessage(chatId, `Гоу продолжим ${foundStory.category} «${foundStory.title}»! Просто нажми на t.me/Zhark10Bot и введи /continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${foundStory._id}`)
     }
   }
