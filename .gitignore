@@ -1,4 +1,8 @@
-/node_modules
+.env
+.env.development
+.env.production
 
 npm-shrinkwrap.json
 package-lockdown.json
+
+/node_modules
