@@ -1,10 +1,10 @@
 import pkg from 'node-emoji';
 
-import { CONSTANTS } from "../config/constants.js"
-import { storyExample } from '../models/StoryExample.js'
-import { Story } from '../models/Story.js'
-import { User } from '../models/User.js'
-import { getFactStepSize } from '../utils/get-fact-step-size.js'
+import { CONSTANTS } from "../../config/constants.js"
+import { storyExample } from '../../models/StoryExample.js'
+import { Story } from '../../models/Story.js'
+import { User } from '../../models/User.js'
+import { getFactStepSize } from '../../utils/get-fact-step-size.js'
 
 const { emoji } = pkg;
 
