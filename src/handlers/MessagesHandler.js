@@ -1,4 +1,4 @@
-import { CommandService } from "../services/CommandService.js"
+import { CommandService } from "../services/command/CommandService.js"
 import { CONSTANTS } from "../config/constants.js"
 import { findCommandByUserMessage } from "../utils/find-command-by-user-message.js"
 
