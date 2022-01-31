@@ -8,5 +8,5 @@ updateDependencies(p.devDependencies, v.dependencies)
 fs.writeFileSync('package-lockdown.json', JSON.stringify(p, null, 2))
 
 function updateDependencies(list, v) {
-  for (var d in list) list[d] = v[d].version
+  for (var d in list) list[d] = v[d]?.version
 }
