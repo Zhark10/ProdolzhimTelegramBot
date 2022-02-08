@@ -5,23 +5,16 @@ import { storyExample } from '../../models/StoryExample.js'
 import { Story } from '../../models/Story.js'
 import { User } from '../../models/User.js'
 import { getFactStepSize } from '../../utils/get-fact-step-size.js'
+import { CommandServiceUtils } from './CommandServiceUtils.js'
 
 const { emoji } = pkg
 
 const { SEPARATOR_TO_CREATE_UNIQUE_COMMAND } = CONSTANTS
 
-export class CommandService {
-  constructor(bot) {
-    this.bot = bot
-  }
-
+export class CommandService extends CommandServiceUtils {
   start = async (msg) => {
-    const user = {
-      firstname: msg.from.first_name,
-      lastname: msg.from.last_name,
-    }
     const chatId = msg.chat.id
-    const isUserAlreadyExist = await User.findOne(user).exec()
+    const isUserAlreadyExist = await this.findUserByMessage(msg)
     if (!isUserAlreadyExist) {
       await User.create(user)
     }
@@ -41,10 +34,11 @@ export class CommandService {
       { currentHistoryId: createdStory._id }
     )
 
-    const firstMessage = `${storyExample.category} «${storyExample.title}»`
-    await this.bot.sendMessage(chatId, firstMessage)
-    const secondMessage = `Чтобы продолжить историю, нажми на /continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${createdStory._id}`
-    return this.bot.sendMessage(chatId, secondMessage)
+    const messageQueue = [
+      `${storyExample.category} «${storyExample.title}»`,
+      `Чтобы продолжить историю, нажми на /continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${createdStory._id}`
+    ]
+    return this.sendMessageQueue(chatId, messageQueue)
   }
 
   continue = async (msg) => {
@@ -60,56 +54,43 @@ export class CommandService {
 
     const foundStory = await Story.findById(historyIdToSearching)
     if (foundStory) {
-      await this.bot.sendMessage(
-        chatId,
-        `Продолжим ${foundStory.category.toLowerCase()} «${
-          foundStory.title
-        }»? :) Скопируй полностью отрывок ниже и дополни следующим сообщением!`
-      )
-      return this.bot.sendMessage(chatId, foundStory.text)
+      const messageQueue = [
+        `Продолжим ${foundStory.category.toLowerCase()} «${foundStory.title}»? :) Скопируй полностью отрывок ниже и дополни следующим сообщением!`,
+        foundStory.text
+      ]
+
+      return this.sendMessageQueue(chatId, messageQueue)
     }
 
-    return this.bot.sendMessage(
-      chatId,
-      'К сожалению, история не найдена:( Возможно, она была удалена автором.'
-    )
+    const message = 'К сожалению, история не найдена:( Возможно, она была удалена автором.'
+    return this.bot.sendMessage(chatId, message)
   }
 
   checkingNextHistoryVersion = async (msg) => {
     const text = msg.text
     const chatId = msg.chat.id
 
-    const currentUser = await User.findOne({
-      firstname: msg.from.first_name,
-      lastname: msg.from.last_name,
-    }).exec()
-    if (!currentUser?.currentHistoryId) {
-      return this.bot.sendMessage(chatId, 'Извини, но я тебя не понимаю!')
-    }
+    const currentUser = await this.findUserByMessage(msg)
+    if (!currentUser?.currentHistoryId) return this.bot.sendMessage(chatId, 'Извини, но я тебя не понимаю!')
 
     const foundStory = await Story.findById(currentUser.currentHistoryId).exec()
-    if (foundStory) {
-      if (!text.includes(foundStory.text)) {
-        return this.bot.sendMessage(
-          chatId,
-          `Нее, так не пойдет${emoji.exclamation} Ты не можешь переписывать предыдущую часть...`
-        )
-      }
-      if (getFactStepSize(text, foundStory.text) > foundStory.stepSize) {
-        return this.bot.sendMessage(
-          chatId,
-          `К сожалению, твой отрывок превышает допустимый лимит (${foundStory.stepSize} слов), который задал автор!`
-        )
-      }
-      await Story.updateOne({ _id: foundStory._id }, { text })
-      await this.bot.sendMessage(
-        chatId,
-        `Ееее, записано ${emoji.writing_hand} Ты просто космос${emoji.sparkles} Теперь перешли другу следующее сообщение:`
-      )
-      return this.bot.sendMessage(
-        chatId,
-        `Гоу продолжим ${foundStory.category} «${foundStory.title}»! Просто нажми на t.me/Zhark10Bot и введи /continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${foundStory._id}`
-      )
+
+    if (!foundStory) return
+
+    if (!text.includes(foundStory.text)) {
+      const message = `Нее, так не пойдет${emoji.exclamation} Ты не можешь переписывать предыдущую часть...`
+      return this.bot.sendMessage(chatId, message)
     }
+    if (getFactStepSize(text, foundStory.text) > foundStory.stepSize) {
+      const message = `К сожалению, твой отрывок превышает допустимый лимит (${foundStory.stepSize} слов), который задал автор!`
+      return this.bot.sendMessage(chatId, message)
+    }
+    await Story.updateOne({ _id: foundStory._id }, { text })
+
+    const messagesQueue = [
+      `Ееее, записано ${emoji.writing_hand} Ты просто космос${emoji.sparkles} Теперь перешли другу следующее сообщение:`,
+      `Гоу продолжим ${foundStory.category} «${foundStory.title}»! Просто нажми на t.me/Zhark10Bot и введи /continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${foundStory._id}`
+    ]
+    return this.bot.sendMessageQueue(chatId, messagesQueue)
   }
 }
