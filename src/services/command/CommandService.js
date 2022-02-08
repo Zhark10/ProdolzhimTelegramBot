@@ -16,26 +16,21 @@ export class CommandService {
   }
 
   start = async (msg) => {
-    const chatId = msg.chat.id
-    const isUserAlreadyExist = await User.findOne({
+    const user = {
       firstname: msg.from.first_name,
       lastname: msg.from.last_name,
-    }).exec()
+    }
+    const chatId = msg.chat.id
+    const isUserAlreadyExist = await User.findOne(user).exec()
     if (!isUserAlreadyExist) {
-      await User.create({
-        firstname: msg.from.first_name,
-        lastname: msg.from.last_name,
-      })
+      await User.create(user)
     }
 
-    await this.bot.sendSticker(
-      chatId,
+    const sticker =
       'https://tlgrm.ru/_/stickers/e1f/4c4/e1f4c48a-c808-37a7-a037-bfa58e8b3222/1.webp'
-    )
-    return this.bot.sendMessage(
-      chatId,
-      `Привет, ${msg.from.first_name} ${msg.from.last_name}${emoji.v} Добро пожаловать в "Продолжим?"`
-    )
+    const message = `Привет, ${msg.from.first_name} ${msg.from.last_name}${emoji.v} Добро пожаловать в "Продолжим?"`
+    await this.bot.sendSticker(chatId, sticker)
+    return this.bot.sendMessage(chatId, message)
   }
 
   create = async (msg) => {
@@ -45,14 +40,11 @@ export class CommandService {
       { firstname: msg.from.first_name, lastname: msg.from.last_name },
       { currentHistoryId: createdStory._id }
     )
-    await this.bot.sendMessage(
-      chatId,
-      `${storyExample.category} «${storyExample.title}»`
-    )
-    return this.bot.sendMessage(
-      chatId,
-      `Чтобы продолжить историю, нажми на /continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${createdStory._id}`
-    )
+
+    const firstMessage = `${storyExample.category} «${storyExample.title}»`
+    await this.bot.sendMessage(chatId, firstMessage)
+    const secondMessage = `Чтобы продолжить историю, нажми на /continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${createdStory._id}`
+    return this.bot.sendMessage(chatId, secondMessage)
   }
 
   continue = async (msg) => {
