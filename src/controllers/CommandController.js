@@ -6,6 +6,7 @@ import { Story } from '../models/Story.js'
 import { User } from '../models/User.js'
 import { getFactStepSize } from '../utils/get-fact-step-size.js'
 import { CommandService } from '../services/CommandService.js'
+import { TemplateService } from '../services/TemplateService.js'
 
 const { emoji } = pkg
 
@@ -15,6 +16,7 @@ export class CommandController {
   constructor(bot) {
     this.bot = bot
     this.commandService = new CommandService(bot)
+    this.templateService = new TemplateService()
   }
 
   start = async (msg) => {
@@ -24,11 +26,9 @@ export class CommandController {
       await User.create(user)
     }
 
-    const sticker =
-      'https://tlgrm.ru/_/stickers/e1f/4c4/e1f4c48a-c808-37a7-a037-bfa58e8b3222/1.webp'
     const message = `Привет, ${msg.from.first_name} ${msg.from.last_name}${emoji.v} Добро пожаловать в "Продолжим?"`
-    await this.bot.sendSticker(chatId, sticker)
-    return this.bot.sendMessage(chatId, message)
+    const picture = await this.templateService.createTemplateForSimpleMessage(message)
+    return this.bot.sendPhoto(chatId, picture)
   }
 
   create = async (msg) => {
