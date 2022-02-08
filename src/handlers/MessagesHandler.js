@@ -1,4 +1,4 @@
-import { CommandService } from '../services/command/CommandService.js'
+import { CommandController } from '../controllers/CommandController.js'
 import { CONSTANTS } from '../config/constants.js'
 import { findCommandByUserMessage } from '../utils/find-command-by-user-message.js'
 
@@ -6,18 +6,18 @@ const { ALL_COMMANDS, MENU_COMMANDS } = CONSTANTS
 
 export const MessagesHandler = async (bot) => {
   bot.setMyCommands(MENU_COMMANDS)
-  const commandService = new CommandService(bot)
+  const commandController= new CommandController(bot)
 
   bot.on('message', async (message) => {
     const actions = {
-      [ALL_COMMANDS.start]: commandService.start,
-      [ALL_COMMANDS.create]: commandService.create,
-      [ALL_COMMANDS.continue]: commandService.continue,
+      [ALL_COMMANDS.start]: commandController.start,
+      [ALL_COMMANDS.create]: commandController.create,
+      [ALL_COMMANDS.continue]: commandController.continue,
     }
 
     const foundCommand = findCommandByUserMessage(message.text)
     const definedAction =
-      actions[foundCommand] || commandService.checkingNextHistoryVersion
+      actions[foundCommand] || commandController.checkingNextHistoryVersion
     return definedAction(message)
   })
 }

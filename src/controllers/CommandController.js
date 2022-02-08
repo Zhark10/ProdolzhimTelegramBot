@@ -1,20 +1,25 @@
 import pkg from 'node-emoji'
 
-import { CONSTANTS } from '../../config/constants.js'
-import { storyExample } from '../../models/StoryExample.js'
-import { Story } from '../../models/Story.js'
-import { User } from '../../models/User.js'
-import { getFactStepSize } from '../../utils/get-fact-step-size.js'
-import { CommandServiceUtils } from './CommandServiceUtils.js'
+import { CONSTANTS } from '../config/constants.js'
+import { storyExample } from '../models/StoryExample.js'
+import { Story } from '../models/Story.js'
+import { User } from '../models/User.js'
+import { getFactStepSize } from '../utils/get-fact-step-size.js'
+import { CommandService } from '../services/CommandService.js'
 
 const { emoji } = pkg
 
 const { SEPARATOR_TO_CREATE_UNIQUE_COMMAND } = CONSTANTS
 
-export class CommandService extends CommandServiceUtils {
+export class CommandController {
+  constructor(bot) {
+    this.bot = bot
+    this.commandService = new CommandService(bot)
+  }
+
   start = async (msg) => {
     const chatId = msg.chat.id
-    const isUserAlreadyExist = await this.findUserByMessage(msg)
+    const isUserAlreadyExist = await this.commandService.findUserByMessage(msg)
     if (!isUserAlreadyExist) {
       await User.create(user)
     }
@@ -38,7 +43,7 @@ export class CommandService extends CommandServiceUtils {
       `${storyExample.category} «${storyExample.title}»`,
       `Чтобы продолжить историю, нажми на /continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${createdStory._id}`
     ]
-    return this.sendMessageQueue(chatId, messageQueue)
+    return this.commandService.sendMessageQueue(chatId, messageQueue)
   }
 
   continue = async (msg) => {
@@ -59,7 +64,7 @@ export class CommandService extends CommandServiceUtils {
         foundStory.text
       ]
 
-      return this.sendMessageQueue(chatId, messageQueue)
+      return this.commandService.sendMessageQueue(chatId, messageQueue)
     }
 
     const message = 'К сожалению, история не найдена:( Возможно, она была удалена автором.'
@@ -70,7 +75,7 @@ export class CommandService extends CommandServiceUtils {
     const text = msg.text
     const chatId = msg.chat.id
 
-    const currentUser = await this.findUserByMessage(msg)
+    const currentUser = await this.commandService.findUserByMessage(msg)
     if (!currentUser?.currentHistoryId) return this.bot.sendMessage(chatId, 'Извини, но я тебя не понимаю!')
 
     const foundStory = await Story.findById(currentUser.currentHistoryId).exec()
@@ -91,6 +96,6 @@ export class CommandService extends CommandServiceUtils {
       `Ееее, записано ${emoji.writing_hand} Ты просто космос${emoji.sparkles} Теперь перешли другу следующее сообщение:`,
       `Гоу продолжим ${foundStory.category} «${foundStory.title}»! Просто нажми на t.me/Zhark10Bot и введи /continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${foundStory._id}`
     ]
-    return this.bot.sendMessageQueue(chatId, messagesQueue)
+    return this.commandService.sendMessageQueue(chatId, messagesQueue)
   }
 }

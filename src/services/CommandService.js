@@ -1,11 +1,13 @@
-export class CommandServiceUtils {
+import { User } from '../models/User.js'
+
+export class CommandService {
   constructor(bot) {
     this.bot = bot
   }
 
   sendMessageQueue = async (chatId, messageQueue) => {
     return messageQueue.forEach(async (message) => {
-      await this.bot.sendMessage(chatId, message)
+      return this.bot.sendMessage(chatId, message)
     })
   }
 
