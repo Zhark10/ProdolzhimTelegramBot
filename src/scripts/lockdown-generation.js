@@ -1,4 +1,4 @@
-import fs from "fs"
+import fs from 'fs'
 var p = JSON.parse(fs.readFileSync('package.json'))
 var v = JSON.parse(fs.readFileSync('npm-shrinkwrap.json'))
 

@@ -1,7 +1,7 @@
 export const getHtmlTemplateForSimpleMessage = (message) => {
   const colors = {
     primary: '#000000',
-    secondary: '#ffff00'
+    secondary: '#ffff00',
   }
   return `
     <body style="
