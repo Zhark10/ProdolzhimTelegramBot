@@ -15,12 +15,14 @@ export class CommandService {
 
   sendStyledMessageQueue = async (chatId, messageQueue) => {
     return messageQueue.forEach(async (message) => {
-      const picture = await this.templateService.createTemplateForSimpleMessage(message)
+      const picture = await this.templateService.createTemplateForSimpleMessage(
+        message
+      )
       return this.bot.sendPhoto(chatId, picture)
     })
   }
 
-  findUserByMessage = async msg => {
+  findUserByMessage = async (msg) => {
     return User.findOne({
       firstname: msg.from.first_name,
       lastname: msg.from.last_name,

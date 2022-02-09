@@ -27,7 +27,9 @@ export class CommandController {
     }
 
     const message = `Привет, ${msg.from.first_name} ${msg.from.last_name}${emoji.v} Добро пожаловать в "Продолжим?"`
-    const picture = await this.templateService.createTemplateForSimpleMessage(message)
+    const picture = await this.templateService.createTemplateForSimpleMessage(
+      message
+    )
     return this.bot.sendPhoto(chatId, picture)
   }
 
@@ -41,7 +43,7 @@ export class CommandController {
 
     const messageQueue = [
       `${storyExample.category} «${storyExample.title}»`,
-      `Чтобы продолжить историю, нажми на /continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${createdStory._id}`
+      `Чтобы продолжить историю, нажми на /continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${createdStory._id}`,
     ]
     return this.commandService.sendMessageQueue(chatId, messageQueue)
   }
@@ -60,14 +62,17 @@ export class CommandController {
     const foundStory = await Story.findById(historyIdToSearching)
     if (foundStory) {
       const messageQueue = [
-        `Продолжим ${foundStory.category.toLowerCase()} «${foundStory.title}»? :) Скопируй полностью отрывок ниже и дополни следующим сообщением!`,
-        foundStory.text
+        `Продолжим ${foundStory.category.toLowerCase()} «${
+          foundStory.title
+        }»? :) Скопируй полностью отрывок ниже и дополни следующим сообщением!`,
+        foundStory.text,
       ]
 
       return this.commandService.sendMessageQueue(chatId, messageQueue)
     }
 
-    const message = 'К сожалению, история не найдена:( Возможно, она была удалена автором.'
+    const message =
+      'К сожалению, история не найдена:( Возможно, она была удалена автором.'
     return this.bot.sendMessage(chatId, message)
   }
 
@@ -76,7 +81,8 @@ export class CommandController {
     const chatId = msg.chat.id
 
     const currentUser = await this.commandService.findUserByMessage(msg)
-    if (!currentUser?.currentHistoryId) return this.bot.sendMessage(chatId, 'Извини, но я тебя не понимаю!')
+    if (!currentUser?.currentHistoryId)
+      return this.bot.sendMessage(chatId, 'Извини, но я тебя не понимаю!')
 
     const foundStory = await Story.findById(currentUser.currentHistoryId).exec()
 
@@ -94,7 +100,7 @@ export class CommandController {
 
     const messagesQueue = [
       `Ееее, записано ${emoji.writing_hand} Ты просто космос${emoji.sparkles} Теперь перешли другу следующее сообщение:`,
-      `Гоу продолжим ${foundStory.category} «${foundStory.title}»! Просто нажми на t.me/Zhark10Bot и введи /continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${foundStory._id}`
+      `Гоу продолжим ${foundStory.category} «${foundStory.title}»! Просто нажми на t.me/Zhark10Bot и введи /continue${SEPARATOR_TO_CREATE_UNIQUE_COMMAND}${foundStory._id}`,
     ]
     return this.commandService.sendMessageQueue(chatId, messagesQueue)
   }

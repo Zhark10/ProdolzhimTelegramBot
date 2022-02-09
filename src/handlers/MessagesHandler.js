@@ -6,7 +6,7 @@ const { ALL_COMMANDS, MENU_COMMANDS } = CONSTANTS
 
 export const MessagesHandler = async (bot) => {
   bot.setMyCommands(MENU_COMMANDS)
-  const commandController= new CommandController(bot)
+  const commandController = new CommandController(bot)
 
   bot.on('message', async (message) => {
     const actions = {
