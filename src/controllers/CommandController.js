@@ -21,10 +21,8 @@ export class CommandController {
 
   start = async (msg) => {
     const chatId = msg.chat.id
-    const isUserAlreadyExist = await this.commandService.findUserByMessage(msg)
-    if (!isUserAlreadyExist) {
-      await User.create(user)
-    }
+    const user = await this.commandService.findUserByMessage(msg)
+    if (!user) await User.create(user)
 
     const message = `Привет, ${msg.from.first_name} ${msg.from.last_name}${emoji.v} Добро пожаловать в "Продолжим?"`
     const picture = await this.templateService.createTemplateForSimpleMessage(
